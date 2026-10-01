@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>У меня к тебе один вопрос 💌</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="hearts" id="hearts"></div>
+
+  <main class="card" id="card">
+    <!-- Экран 1: Приветствие -->
+    <section class="screen active" data-screen="0">
+      <div class="emoji">💌</div>
+      <h1>Привет!</h1>
+      <p>У меня к тебе очень важный вопрос.<br>Но сначала — маленькое испытание 😏</p>
+      <button class="btn primary" data-next>Погнали →</button>
+    </section>
+
+    <!-- Экран 2: Кнопка-обманка -->
+    <section class="screen" data-screen="1">
+      <div class="emoji">🥺</div>
+      <h1>Пойдёшь со мной на свидание?</h1>
+      <div class="buttons" id="runawayZone">
+        <button class="btn primary" id="yesBtn">Да 💖</button>
+        <button class="btn ghost" id="noBtn">Нет</button>
+      </div>
+      <p class="hint" id="hint"></p>
+    </section>
+
+    <!-- Экран 3: Выбор настроения -->
+    <section class="screen" data-screen="2">
+      <div class="emoji">✨</div>
+      <h1>Отлично! А что тебе ближе?</h1>
+      <div class="choices" id="choices">
+        <button class="choice" data-choice="coffee">☕ Уютное кафе</button>
+        <button class="choice" data-choice="walk">🌆 Вечерняя прогулка</button>
+        <button class="choice" data-choice="cinema">🎬 Кино</button>
+        <button class="choice" data-choice="surprise">🎁 Сюрприз от меня</button>
+      </div>
+    </section>
+
+    <!-- Экран 4: Финальное приглашение -->
+    <section class="screen" data-screen="3">
+      <div class="emoji">🎉</div>
+      <h1>Ты сделал(а) мой день!</h1>
+      <div class="invite" id="inviteText"></div>
+      <div class="details">
+        <input type="text" id="nameInput" placeholder="Как тебя зовут?">
+        <input type="date" id="dateInput">
+        <input type="time" id="timeInput" value="19:00">
+      </div>
+      <button class="btn primary" id="sendBtn">Подтвердить 💌</button>
+      <p class="tiny">* Время и место можем поменять — главное, что мы вместе 😊</p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
