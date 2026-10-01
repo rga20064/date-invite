@@ -1,18 +1,41 @@
+// ==== Telegram WebApp ====
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();                    // развернуть на весь экран
+  tg.disableVerticalSwipes?.();   // чтобы не закрывалось случайно
+  tg.setHeaderColor?.('secondary_bg_color');
+  tg.setBackgroundColor?.('#ffe6ee');
+
+  // Имя пользователя из Telegram
+  const user = tg.initDataUnsafe?.user;
+  if (user?.first_name) {
+    document.getElementById('userName').textContent = `, ${user.first_name}`;
+  }
+}
+
+// Тактильный отклик (вибрация) — работает только в TG
+function haptic(type = 'light') {
+  tg?.HapticFeedback?.impactOccurred(type);
+}
+function notify(type = 'success') {
+  tg?.HapticFeedback?.notificationOccurred(type);
+}
+
 // ==== Плавающие сердечки ====
 const heartsBox = document.getElementById('hearts');
-const HEART_EMOJIS = ['💖','💕','💗','❤️','💘','🌸'];
-
+const HEARTS = ['💖','💕','💗','❤️','💘','🌸'];
 function spawnHeart() {
   const h = document.createElement('div');
   h.className = 'heart';
-  h.textContent = HEART_EMOJIS[Math.floor(Math.random() * HEART_EMOJIS.length)];
+  h.textContent = HEARTS[Math.floor(Math.random() * HEARTS.length)];
   h.style.left = Math.random() * 100 + 'vw';
   h.style.animationDuration = (6 + Math.random() * 6) + 's';
   h.style.fontSize = (16 + Math.random() * 20) + 'px';
   heartsBox.appendChild(h);
   setTimeout(() => h.remove(), 12000);
 }
-setInterval(spawnHeart, 400);
+setInterval(spawnHeart, 450);
 
 // ==== Навигация по экранам ====
 const screens = document.querySelectorAll('.screen');
@@ -22,6 +45,7 @@ function goTo(index) {
   screens[current].classList.remove('active');
   screens[index].classList.add('active');
   current = index;
+  haptic('light');
 }
 
 document.querySelectorAll('[data-next]').forEach(btn => {
@@ -35,7 +59,7 @@ const hint = document.getElementById('hint');
 let noCount = 0;
 
 const NO_PHRASES = [
-  'Уверен(а)? 🥺',
+  'Уверена? 🥺',
   'Кнопка убегает... но я — нет 😌',
   'Ну пожалуйста 🙏',
   'Ты серьёзно?? 💔',
@@ -45,14 +69,12 @@ const NO_PHRASES = [
 
 function moveNo() {
   noCount++;
-  // Убегает
-  const x = (Math.random() - 0.5) * 260;
-  const y = (Math.random() - 0.5) * 160;
-  noBtn.style.transform = `translate(${x}px, ${y}px)`;
+  haptic('rigid');
 
-  // Уменьшается, а "Да" растёт
-  const scale = Math.max(0.5, 1 - noCount * 0.1);
-  noBtn.style.fontSize = (16 * scale) + 'px';
+  const x = (Math.random() - 0.5) * 220;
+  const y = (Math.random() - 0.5) * 140;
+  noBtn.style.transform = `translate(${x}px, ${y}px)`;
+  noBtn.style.fontSize = Math.max(0.5, 1 - noCount * 0.1) * 16 + 'px';
   yesBtn.style.transform = `scale(${1 + noCount * 0.08})`;
 
   hint.textContent = NO_PHRASES[Math.min(noCount - 1, NO_PHRASES.length - 1)];
@@ -64,67 +86,86 @@ function moveNo() {
 }
 
 noBtn.addEventListener('mouseenter', moveNo);
-noBtn.addEventListener('click', moveNo);
-// На мобильных — touch
-noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNo(); });
+noBtn.addEventListener('click', (e) => { e.preventDefault(); moveNo(); });
+noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNo(); }, { passive: false });
 
-yesBtn.addEventListener('click', () => goTo(2));
+yesBtn.addEventListener('click', () => {
+  notify('success');
+  goTo(2);
+});
 
-// ==== Выбор настроения ====
+// ==== Выбор формата ====
 let chosen = null;
 document.querySelectorAll('.choice').forEach(btn => {
   btn.addEventListener('click', () => {
+    haptic('medium');
     document.querySelectorAll('.choice').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
     chosen = btn.dataset.choice;
-
-    setTimeout(() => {
-      buildInvite(chosen);
-      goTo(3);
-    }, 400);
+    setTimeout(() => { buildInvite(chosen); goTo(3); }, 350);
   });
 });
 
-// ==== Финальное приглашение ====
+// ==== Приглашение ====
 const INVITES = {
-  coffee: { emoji: '☕', text: 'Приглашаю тебя на чашку кофе в уютном месте, где никто не будет нас торопить.' },
-  walk:  { emoji: '🌆', text: 'Давай встретим закат вместе — просто гулять и говорить обо всём на свете.' },
-  cinema:{ emoji: '🎬', text: 'Предлагаю кино: я беру билеты, ты берёшь хорошее настроение.' },
-  surprise:{ emoji: '🎁', text: 'У меня есть маленький сюрприз — но покажу его только при личной встрече 😉' }
+  coffee:   { emoji: '☕', text: 'Приглашаю тебя на чашку кофе в уютном месте, где никто не будет нас торопить.' },
+  walk:     { emoji: '🌆', text: 'Давай встретим закат вместе — просто гулять и говорить обо всём на свете.' },
+  cinema:   { emoji: '🎬', text: 'Предлагаю кино: я беру билеты, ты берёшь хорошее настроение.' },
+  surprise: { emoji: '🎁', text: 'У меня есть маленький сюрприз — покажу только при личной встрече 😉' }
 };
 
 function buildInvite(type) {
-  const data = INVITES[type];
+  const d = INVITES[type];
   document.getElementById('inviteText').innerHTML =
-    `<div style="font-size:32px;margin-bottom:8px;">${data.emoji}</div>${data.text}`;
+    `<div style="font-size:30px;margin-bottom:6px;">${d.emoji}</div>${d.text}`;
 }
 
-// ==== Подтверждение (для Telegram WebApp или просто alert) ====
-document.getElementById('sendBtn').addEventListener('click', () => {
-  const name = document.getElementById('nameInput').value.trim();
-  const date = document.getElementById('dateInput').value;
-  const time = document.getElementById('timeInput').value;
+// ==== Подтверждение ====
+const sendBtn = document.getElementById('sendBtn');
+sendBtn.addEventListener('click', () => {
+  const name  = document.getElementById('nameInput').value.trim();
+  const date  = document.getElementById('dateInput').value;
+  const time  = document.getElementById('timeInput').value;
 
   if (!name || !date) {
-    alert('Заполни имя и дату, пожалуйста 💕');
+    notify('error');
+    tg?.showAlert ? tg.showAlert('Заполни имя и дату, пожалуйста 💕')
+                  : alert('Заполни имя и дату, пожалуйста 💕');
     return;
   }
 
-  const message = `💌 Свидание подтверждено!\n\n👤 ${name}\n📅 ${date} в ${time}\n\nДо встречи ❤️`;
+  const payload = { name, date, time, type: chosen };
+  const message =
+    `💌 Свидание подтверждено!\n\n` +
+    `👤 ${name}\n📅 ${date} в ${time}\n🎯 ${INVITES[chosen].emoji} ${INVITES[chosen].text}`;
 
-  // Если открыто в Telegram WebApp
-  if (window.Telegram?.WebApp) {
-    window.Telegram.WebApp.sendData(JSON.stringify({ name, date, time }));
-    window.Telegram.WebApp.showAlert('Приглашение отправлено! 💖');
+  notify('success');
+
+  // Отправляем данные боту
+  if (tg) {
+    try {
+      tg.sendData(JSON.stringify(payload));
+    } catch (e) {
+      tg.showAlert('Приглашение отправлено! 💖');
+    }
+    // Показываем финальный экран сразу
+    document.getElementById('finalText').textContent = message;
+    goTo(4);
   } else {
-    // Обычный сайт: показываем финальный экран + можно отправить себе в TG
-    document.querySelector('.card').innerHTML = `
-      <div class="emoji">💞</div>
-      <h1>Жду тебя!</h1>
-      <p style="white-space:pre-line;font-size:17px;">${message}</p>
-      <a class="btn primary" style="display:inline-block;text-decoration:none;margin-top:10px;"
-         href="https://t.me/share/url?url=${encodeURIComponent('Я иду на свидание! 💖')}&text=${encodeURIComponent(message)}"
-         target="_blank">Поделиться в Telegram</a>
-    `;
+    // Открыто вне Telegram
+    document.getElementById('finalText').textContent = message;
+    goTo(4);
   }
 });
+
+// Кнопка "Назад" в Telegram
+if (tg) {
+  tg.BackButton.onClick(() => {
+    if (current > 0) goTo(current - 1);
+    if (current === 0) tg.BackButton.hide();
+  });
+  // Показываем кнопку "назад" только после первого экрана
+  const observer = setInterval(() => {
+    current > 0 ? tg.BackButton.show() : tg.BackButton.hide();
+  }, 500);
+}

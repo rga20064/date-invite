@@ -2,23 +2,24 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>У меня к тебе один вопрос 💌</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Приглашение 💌</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="hearts" id="hearts"></div>
 
   <main class="card" id="card">
-    <!-- Экран 1: Приветствие -->
+    <!-- Экран 0: Приветствие -->
     <section class="screen active" data-screen="0">
       <div class="emoji">💌</div>
-      <h1>Привет!</h1>
-      <p>У меня к тебе очень важный вопрос.<br>Но сначала — маленькое испытание 😏</p>
+      <h1>Привет<span id="userName"></span>!</h1>
+      <p>У меня к тебе один очень важный вопрос.<br>Но сначала — маленькое испытание 😏</p>
       <button class="btn primary" data-next>Погнали →</button>
     </section>
 
-    <!-- Экран 2: Кнопка-обманка -->
+    <!-- Экран 1: Убегающая кнопка "Нет" -->
     <section class="screen" data-screen="1">
       <div class="emoji">🥺</div>
       <h1>Пойдёшь со мной на свидание?</h1>
@@ -29,7 +30,7 @@
       <p class="hint" id="hint"></p>
     </section>
 
-    <!-- Экран 3: Выбор настроения -->
+    <!-- Экран 2: Выбор формата -->
     <section class="screen" data-screen="2">
       <div class="emoji">✨</div>
       <h1>Отлично! А что тебе ближе?</h1>
@@ -41,10 +42,10 @@
       </div>
     </section>
 
-    <!-- Экран 4: Финальное приглашение -->
+    <!-- Экран 3: Финальное приглашение -->
     <section class="screen" data-screen="3">
       <div class="emoji">🎉</div>
-      <h1>Ты сделал(а) мой день!</h1>
+      <h1>Ты сделала мой день!</h1>
       <div class="invite" id="inviteText"></div>
       <div class="details">
         <input type="text" id="nameInput" placeholder="Как тебя зовут?">
@@ -52,7 +53,14 @@
         <input type="time" id="timeInput" value="19:00">
       </div>
       <button class="btn primary" id="sendBtn">Подтвердить 💌</button>
-      <p class="tiny">* Время и место можем поменять — главное, что мы вместе 😊</p>
+      <p class="tiny">Время и место можем поменять — главное, что мы вместе 😊</p>
+    </section>
+
+    <!-- Экран 4: Успех -->
+    <section class="screen" data-screen="4">
+      <div class="emoji">💞</div>
+      <h1>Жду тебя!</h1>
+      <p id="finalText" style="white-space:pre-line;font-size:17px;"></p>
     </section>
   </main>
 
