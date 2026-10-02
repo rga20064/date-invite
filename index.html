@@ -13,11 +13,9 @@
     color: #e2e8f0;
     min-height: 100vh;
     padding: 20px;
+    padding-bottom: 40px;
   }
-  .header {
-    text-align: center;
-    padding: 30px 0 20px;
-  }
+  .header { text-align: center; padding: 20px 0 10px; }
   .header h1 {
     font-size: 26px;
     background: linear-gradient(90deg, #38bdf8, #a78bfa);
@@ -25,16 +23,39 @@
     -webkit-text-fill-color: transparent;
     margin-bottom: 8px;
   }
-  .header p {
-    color: #94a3b8;
-    font-size: 14px;
+  .header p { color: #94a3b8; font-size: 14px; }
+
+  /* Шкала прогресса */
+  .progress-box {
+    background: #1e293b;
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-top: 18px;
+    border: 1px solid #334155;
   }
-  .menu {
+  .progress-top {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 20px;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 10px;
+    color: #cbd5e1;
   }
+  .progress-top span:last-child { color: #38bdf8; font-weight: 600; }
+  .progress-bar {
+    height: 10px;
+    background: #0f172a;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #38bdf8, #a78bfa);
+    border-radius: 99px;
+    transition: width 0.5s ease;
+  }
+
+  .menu { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
   .card {
     background: #1e293b;
     border-radius: 16px;
@@ -46,71 +67,118 @@
     transition: transform 0.15s, background 0.15s;
     border: 1px solid #334155;
   }
-  .card:active {
-    transform: scale(0.98);
-    background: #273449;
+  .card:active { transform: scale(0.98); background: #273449; }
+  .card .icon { font-size: 28px; width: 45px; text-align: center; }
+  .card .text h3 { font-size: 16px; margin-bottom: 3px; }
+  .card .text p { font-size: 12px; color: #94a3b8; }
+
+  /* Экран раздела */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .back-btn {
+    background: none;
+    border: none;
+    color: #38bdf8;
+    font-size: 15px;
+    cursor: pointer;
+    padding: 8px 0;
+    margin-bottom: 10px;
   }
-  .card .icon {
-    font-size: 28px;
-    width: 45px;
-    text-align: center;
+
+  .topic {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
   }
-  .card .text h3 {
-    font-size: 16px;
-    margin-bottom: 3px;
+  .topic h3 { font-size: 16px; margin-bottom: 4px; }
+  .topic p { font-size: 12px; color: #94a3b8; }
+
+  /* Материал темы */
+  .formula {
+    background: #0f172a;
+    border-left: 3px solid #38bdf8;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 12px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 15px;
+    color: #7dd3fc;
   }
-  .card .text p {
-    font-size: 12px;
+  .formula-desc { font-size: 13px; color: #94a3b8; margin-top: 6px; }
+
+  .complete-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #38bdf8, #a78bfa);
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  .complete-btn.done {
+    background: #334155;
     color: #94a3b8;
+    cursor: default;
   }
-  .footer {
-    text-align: center;
-    margin-top: 30px;
-    font-size: 12px;
-    color: #64748b;
-  }
+
+  .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #64748b; }
 </style>
 </head>
 <body>
 
+<!-- ГЛАВНЫЙ ЭКРАН -->
+<div id="screen-main" class="screen active">
   <div class="header">
     <h1>⚛️ Физика</h1>
-    <p>Подготовка к ОГЭ и ЕГЭ</p>
+    <p id="greeting">Подготовка к ОГЭ и ЕГЭ</p>
+  </div>
+
+  <div class="progress-box">
+    <div class="progress-top">
+      <span>Прогресс подготовки</span>
+      <span id="progress-text">0% (0 из 5)</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
   </div>
 
   <div class="menu">
-    <div class="card" onclick="openSection('theory')">
+    <div class="card" onclick="showScreen('theory')">
       <div class="icon">📘</div>
       <div class="text">
         <h3>Справочные материалы</h3>
         <p>Формулы, законы, конспекты</p>
       </div>
     </div>
-
-    <div class="card" onclick="openSection('tests')">
+    <div class="card" onclick="comingSoon('Тесты')">
       <div class="icon">✅</div>
       <div class="text">
         <h3>Тесты</h3>
         <p>Проверь себя по темам</p>
       </div>
     </div>
-
-    <div class="card" onclick="openSection('homework')">
+    <div class="card" onclick="comingSoon('Домашняя работа')">
       <div class="icon">📝</div>
       <div class="text">
         <h3>Домашняя работа</h3>
         <p>Задания и дедлайны</p>
       </div>
     </div>
-
-    <div class="card" onclick="openSection('tips')">
+    <div class="card" onclick="comingSoon('Советы')">
       <div class="icon">💡</div>
       <div class="text">
         <h3>Советы</h3>
         <p>Как сдать экзамен на максимум</p>
       </div>
     </div>
-
     <div class="card" onclick="writeTutor()">
       <div class="icon">✉️</div>
       <div class="text">
@@ -120,42 +188,191 @@
     </div>
   </div>
 
-  <div class="footer">
-    © Ваш репетитор по физике
+  <div class="footer">© Ваш репетитор по физике</div>
+</div>
+
+<!-- ЭКРАН СПРАВОЧНИКА -->
+<div id="screen-theory" class="screen">
+  <button class="back-btn" onclick="showScreen('main')">← Назад</button>
+  <div class="header" style="padding-top:0">
+    <h1 style="font-size:22px">📘 Справочные материалы</h1>
+    <p>Выбери тему для изучения</p>
   </div>
+  <div id="topics-list" style="margin-top:20px"></div>
+</div>
+
+<!-- ЭКРАН ТЕМЫ -->
+<div id="screen-topic" class="screen">
+  <button class="back-btn" onclick="showScreen('theory')">← К темам</button>
+  <div id="topic-content"></div>
+</div>
 
 <script>
-  // Инициализация Telegram Mini App
   const tg = window.Telegram?.WebApp;
   if (tg) {
     tg.ready();
     tg.expand();
-    // Показываем имя ученика, если открыто в Telegram
     const user = tg.initDataUnsafe?.user;
     if (user) {
-      document.querySelector('.header p').textContent =
+      document.getElementById('greeting').textContent =
         `Привет, ${user.first_name}! Готовимся к экзамену`;
     }
   }
 
-  function openSection(section) {
-    // Пока просто уведомление. Сюда потом вставим переходы на разделы.
-    if (tg) {
-      tg.showAlert('Раздел в разработке: ' + section);
-    } else {
-      alert('Раздел в разработке: ' + section);
+  // === ДАННЫЕ ТЕМ ===
+  const topics = [
+    {
+      id: 'mechanics',
+      title: 'Механика',
+      desc: 'Кинематика, динамика, законы Ньютона',
+      formulas: [
+        { f: 'v = v₀ + a·t', d: 'Скорость при равноускоренном движении' },
+        { f: 'S = v₀·t + (a·t²)/2', d: 'Путь при равноускоренном движении' },
+        { f: 'F = m·a', d: 'Второй закон Ньютона' },
+        { f: 'F = G·(m₁·m₂)/r²', d: 'Закон всемирного тяготения' },
+        { f: 'p = m·v', d: 'Импульс тела' }
+      ]
+    },
+    {
+      id: 'thermo',
+      title: 'Термодинамика',
+      desc: 'Теплота, работа газа, КПД',
+      formulas: [
+        { f: 'Q = c·m·Δt', d: 'Количество теплоты при нагреве' },
+        { f: 'Q = λ·m', d: 'Теплота плавления' },
+        { f: 'Q = L·m', d: 'Теплота парообразования' },
+        { f: 'η = A / Q₁ · 100%', d: 'КПД теплового двигателя' },
+        { f: 'p·V = (m/M)·R·T', d: 'Уравнение Менделеева — Клапейрона' }
+      ]
+    },
+    {
+      id: 'electricity',
+      title: 'Электричество',
+      desc: 'Ток, напряжение, закон Ома',
+      formulas: [
+        { f: 'I = U / R', d: 'Закон Ома для участка цепи' },
+        { f: 'P = U·I', d: 'Мощность электрического тока' },
+        { f: 'Q = I²·R·t', d: 'Закон Джоуля — Ленца' },
+        { f: 'R = ρ·L / S', d: 'Сопротивление проводника' }
+      ]
+    },
+    {
+      id: 'optics',
+      title: 'Оптика',
+      desc: 'Отражение, преломление, линзы',
+      formulas: [
+        { f: 'sin α / sin β = n', d: 'Закон преломления света' },
+        { f: '1/F = 1/d + 1/f', d: 'Формула тонкой линзы' },
+        { f: 'D = 1 / F', d: 'Оптическая сила линзы' }
+      ]
+    },
+    {
+      id: 'quantum',
+      title: 'Квантовая физика',
+      desc: 'Фотоны, фотоэффект, атом',
+      formulas: [
+        { f: 'E = h·ν', d: 'Энергия фотона' },
+        { f: 'h·ν = A + Eₖ', d: 'Уравнение Эйнштейна для фотоэффекта' },
+        { f: 'E = m·c²', d: 'Формула Эйнштейна (энергия покоя)' }
+      ]
+    }
+  ];
+
+  // === ПРОГРЕСС ===
+  let completed = [];
+
+  // Загружаем сохранённый прогресс
+  function loadProgress() {
+    const saved = localStorage.getItem('physics_progress');
+    if (saved) {
+      try { completed = JSON.parse(saved); } catch(e) { completed = []; }
     }
   }
 
-  function writeTutor() {
-    // Замените username на свой
-    const username = 'your_username';
-    if (tg) {
-      tg.openTelegramLink('https://t.me/' + username);
-    } else {
-      window.open('https://t.me/' + username, '_blank');
+  // Сохраняем прогресс (и в Telegram Cloud, и локально)
+  function saveProgress() {
+    localStorage.setItem('physics_progress', JSON.stringify(completed));
+    if (tg?.CloudStorage) {
+      tg.CloudStorage.setItem('physics_progress', JSON.stringify(completed));
     }
   }
+
+  function updateProgress() {
+    const percent = Math.round((completed.length / topics.length) * 100);
+    document.getElementById('progress-text').textContent =
+      `${percent}% (${completed.length} из ${topics.length})`;
+    document.getElementById('progress-fill').style.width = percent + '%';
+  }
+
+  function markCompleted(topicId) {
+    if (!completed.includes(topicId)) {
+      completed.push(topicId);
+      saveProgress();
+      updateProgress();
+      renderTopic(topicId);
+    }
+  }
+
+  // === НАВИГАЦИЯ ===
+  function showScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + name).classList.add('active');
+    window.scrollTo(0, 0);
+    if (name === 'theory') renderTopics();
+  }
+
+  // === РЕНДЕР СПИСКА ТЕМ ===
+  function renderTopics() {
+    const container = document.getElementById('topics-list');
+    container.innerHTML = topics.map(t => `
+      <div class="topic" onclick="renderTopic('${t.id}'); showScreen('topic')">
+        <h3>${completed.includes(t.id) ? '✅ ' : ''}${t.title}</h3>
+        <p>${t.desc}</p>
+      </div>
+    `).join('');
+  }
+
+  // === РЕНДЕР ОДНОЙ ТЕМЫ ===
+  function renderTopic(id) {
+    const topic = topics.find(t => t.id === id);
+    if (!topic) return;
+
+    const isDone = completed.includes(id);
+    const formulasHtml = topic.formulas.map(f => `
+      <div class="formula">
+        ${f.f}
+        <div class="formula-desc">${f.d}</div>
+      </div>
+    `).join('');
+
+    document.getElementById('topic-content').innerHTML = `
+      <div class="header" style="padding-top:0">
+        <h1 style="font-size:22px">${topic.title}</h1>
+        <p>${topic.desc}</p>
+      </div>
+      ${formulasHtml}
+      <button class="complete-btn ${isDone ? 'done' : ''}"
+              ${isDone ? 'disabled' : ''}
+              onclick="markCompleted('${id}')">
+        ${isDone ? '✓ Тема пройдена' : 'Отметить как пройденное'}
+      </button>
+    `;
+  }
+
+  function comingSoon(name) {
+    if (tg) tg.showAlert('Раздел «' + name + '» скоро появится');
+    else alert('Раздел «' + name + '» скоро появится');
+  }
+
+  function writeTutor() {
+    const username = 'your_username'; // ← замените на свой ник
+    if (tg) tg.openTelegramLink('https://t.me/' + username);
+    else window.open('https://t.me/' + username, '_blank');
+  }
+
+  // === СТАРТ ===
+  loadProgress();
+  updateProgress();
 </script>
 
 </body>
